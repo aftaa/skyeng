@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use Yii;
@@ -16,6 +17,10 @@ use yii\web\IdentityInterface;
  * @property string $password_reset_token
  * @property string $email
  * @property string $auth_key
+ * @property string $real_name
+ * @property string $org_name
+ * @property integer $type
+ * @property string $INN
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
@@ -26,6 +31,15 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    const TYPE_FIZ = 1;
+    const TYPE_IP = 2;
+    const TYPE_ORG = 3;
+
+    const TYPES = [
+        User::TYPE_FIZ => 'Физическое лицо',
+        User::TYPE_IP => 'Индивидуальный предприниматель',
+        User::TYPE_ORG => 'Юридическое лицо',
+    ];
 
     /**
      * {@inheritdoc}
@@ -53,6 +67,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            ['type', 'in', 'range' => [self::TYPE_FIZ, self::TYPE_IP, self::TYPE_ORG]],
         ];
     }
 
@@ -113,7 +128,7 @@ class User extends ActiveRecord implements IdentityInterface
             return false;
         }
 
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $timestamp = (int)substr($token, strrpos($token, '_') + 1);
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
         return $timestamp + $expire >= time();
     }
@@ -157,6 +172,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Generates password hash from password and sets it to the model
      *
      * @param string $password
+     * @throws \yii\base\Exception
      */
     public function setPassword($password)
     {
