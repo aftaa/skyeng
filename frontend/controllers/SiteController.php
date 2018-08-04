@@ -1,9 +1,16 @@
 <?php
+
 namespace frontend\controllers;
 
+use common\models\SomeDataModel;
 use common\models\User;
 use Yii;
 use yii\base\InvalidParamException;
+use yii\caching\DbDependency;
+use yii\db\ActiveQuery;
+use yii\db\Connection;
+use yii\db\Query;
+use yii\db\QueryBuilder;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -223,4 +230,5 @@ class SiteController extends Controller
     {
         return $this->render('signup-success');
     }
+
 }
